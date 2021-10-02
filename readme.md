@@ -38,7 +38,7 @@ Pasos para la instalación desde github.
 
 ```
 # clonar repositorio
-$ git clone https://github.com/dozz1e/Prueba---Roommates.git
+$ git clone https://github.com/dozz1e/Prueba---Banco-Solar
 
 # Ruta a directorio clonado
 $ cd ../ruta/al/directorio/clonado
