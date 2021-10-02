@@ -88,3 +88,7 @@ Lista de extras agregados al código
 
    - index.html
    - favicon PNG
+
+3. **Conexión Pool**
+
+   Una sola conexión creada en el archivo server.js y pasada vía parametros a todas las funciones que la necesiten.
