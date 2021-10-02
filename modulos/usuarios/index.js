@@ -1,3 +1,4 @@
+// Función para crear usuario en bbdd
 const insertarUsuario = async (datos, pool) => {
   const consulta = {
     text: "INSERT INTO usuarios (nombre,balance) values ($1,$2) RETURNING *;",
@@ -13,6 +14,7 @@ const insertarUsuario = async (datos, pool) => {
   }
 };
 
+// Función para obtener usuarios desde bbdd
 const listarUsuarios = async (pool) => {
   try {
     const result = await pool.query("SELECT * FROM usuarios ORDER BY id DESC;");
@@ -23,6 +25,7 @@ const listarUsuarios = async (pool) => {
   }
 };
 
+// Función para editar usuario en bbdd
 const editarUsuario = async (datos, id, pool) => {
   try {
     const consulta = {
@@ -37,19 +40,20 @@ const editarUsuario = async (datos, id, pool) => {
   }
 };
 
+// Función para eliminar usuario y transferencias de este usuario en bbdd
 const eliminarUsuario = async (datos, pool) => {
   try {
     let consulta = {
       text: "DELETE FROM transferencias WHERE emisor = $1 OR receptor = $1 RETURNING *;",
       values: [datos],
     };
-    let result = await pool.query(consulta);
+    let result = await pool.query(consulta); // Borrar transferencias del usuario a eliminar
     if (result.rowCount > 0) {
       consulta = {
         text: "DELETE FROM usuarios WHERE id = $1 RETURNING *;",
         values: [datos],
       };
-      result = await pool.query(consulta);
+      result = await pool.query(consulta); // Eliminar usuario
       return result.rowCount;
     } else {
       return 0;

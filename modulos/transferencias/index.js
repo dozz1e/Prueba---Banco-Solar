@@ -1,3 +1,4 @@
+// Función para crear transferencia en bbdd
 const insertarTransferencia = async (datos, pool) => {
   const client = await pool.connect();
   const ahora = new Date();
@@ -8,24 +9,24 @@ const insertarTransferencia = async (datos, pool) => {
       text: "INSERT INTO transferencias (emisor,receptor,monto,fecha) values ($1,$2,$3,$4) RETURNING *;",
       values: [...datos, ahora.toISOString()],
     };
-    await client.query(consulta);
+    await client.query(consulta); // Creación de transferencia
     const resp = await client.query(
       `SELECT balance FROM usuarios WHERE id = ${datos[0]};`
-    );
+    ); // Buscar emisor de la transferencia
     if (resp.rows[0].balance >= datos[2]) {
       await client.query(
         `UPDATE usuarios SET balance = ${
           resp.rows[0].balance - datos[2]
         } WHERE id = ${datos[0]} RETURNING *;`
-      );
+      ); // Actualización de balance de emisor
       const receptor = await client.query(
         `SELECT balance FROM usuarios WHERE id = ${datos[1]};`
-      );
+      ); // Buscar receptor de la transferencia
       await client.query(
         `UPDATE usuarios SET balance = ${
           receptor.rows[0].balance + datos[2]
         } WHERE id = ${datos[1]} RETURNING *;`
-      );
+      ); // Actualización de balance de receptor
       await client.query("COMMIT");
     } else {
       await client.query("ROLLBACK");
@@ -41,6 +42,7 @@ const insertarTransferencia = async (datos, pool) => {
   }
 };
 
+// Función para obtener todas las transferencias en bbdd 
 const listarTransferencia = async (pool) => {
   const client = await pool.connect();
   try {
@@ -49,8 +51,8 @@ const listarTransferencia = async (pool) => {
       text: "SELECT * FROM transferencias;",
       rowMode: "array",
     };
-    const result = await client.query(consulta);
-    const usuarios = await client.query("SELECT id, nombre FROM usuarios;");
+    const result = await client.query(consulta); // Consulta de transferencias
+    const usuarios = await client.query("SELECT id, nombre FROM usuarios;"); // Obtener nombres de usuarios
     let resultado = [],
       emi = "",
       recp = "";
@@ -59,7 +61,7 @@ const listarTransferencia = async (pool) => {
         if (u.id == r[1]) emi = u.nombre;
         if (u.id == r[2]) recp = u.nombre;
       });
-      resultado.push([r[0], emi, recp, r[3], r[4]]);
+      resultado.push([r[0], emi, recp, r[3], r[4]]); // Cambio de ids por los nombres a mostrar
     });
     await client.query("COMMIT");
     return resultado;
